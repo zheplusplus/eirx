@@ -7,7 +7,7 @@ def descr():
 
 setup(
         name='eirx',
-        version='0.1',
+        version='0.2',
         author='Neuron Teckid',
         author_email='lene13@gmail.com',
         license='MIT',
@@ -22,6 +22,9 @@ setup(
             ],
         zip_safe=False,
         entry_points=dict(
-                console_scripts=[ 'eirx=eirx.main:main' ],
+                console_scripts=[
+                        'eirx=eirx.main:convert',
+                        'eirxv=eirx.main:view',
+                    ],
             ),
     )
