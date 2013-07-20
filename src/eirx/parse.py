@@ -2,12 +2,27 @@ import re
 import PIL.Image
 
 
+WHITE_RGBA = (255, 255, 255)
+BLACK_RGBA = (0, 0, 0)
+
+
 def _get_size(size):
     for m in _SIZE_RE:
         match = m[0].match(size)
         if match:
             return m[1](match.groupdict())
     raise ValueError('Invalid size')
+
+
+def _get_RGBA(opt_string, index):
+    if len(opt_string) > index + 6:
+        color_string = opt_string[index + 1: index + 7]
+        match = re.compile('^[a-fA-F0-9]{6}$').match(color_string)
+        if match:
+            r, g, b = color_string[:2], color_string[2:4], color_string[4:]
+            r, g, b = [int(n, 16) for n in (r, g, b)]
+            return (r, g, b)
+    raise ValueError('Invalid RGB,not #RRGGBB format')
 
 
 def _get_options(opt):
@@ -24,11 +39,24 @@ def _get_options(opt):
         opt_result['frame'] = True
         return 0
 
+    def fcolor(opt_result, opt_string, index):
+        if opt_string[index] == 'w':
+            opt_result['bgc'] = WHITE_RGBA
+            return 1
+        elif opt_string[index] == 'b':
+            opt_result['bgc'] = BLACK_RGBA
+            return 1
+        elif opt_string[index] == '#':
+            opt_result['bgc'] = _get_RGBA(opt_string, index)
+            return 7
+        raise ValueError('Invalid color')
+
     opt_result = dict()
     opt_map = dict(
             a=not_keep_aspect_ratio,
             c=crop,
-            f=frame
+            f=frame,
+            F=fcolor
         )
     i = 0
     while i < len(opt):
@@ -38,9 +66,6 @@ def _get_options(opt):
             raise ValueError('Invalid option')
         i += 1
     return opt_result
-
-WHITE_RGBA = (255, 255, 255, 0)
-BLACK_RGBA = (0, 0, 0, 0)
 
 
 def adjust(img, w=0, h=0, adjust_width=False, adjust_height=False, crop=False,
