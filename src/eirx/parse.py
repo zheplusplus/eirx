@@ -1,12 +1,14 @@
 import re
 import PIL.Image
 
+
 def _get_size(size):
     for m in _SIZE_RE:
         match = m[0].match(size)
         if match:
             return m[1](match.groupdict())
     raise ValueError('Invalid size')
+
 
 def _get_options(opt):
     def not_keep_aspect_ratio(opt_result, opt_string, index):
@@ -18,10 +20,15 @@ def _get_options(opt):
         opt_result['crop'] = True
         return 0
 
+    def frame(opt_result, opt_string, index):
+        opt_result['frame'] = True
+        return 0
+
     opt_result = dict()
     opt_map = dict(
             a=not_keep_aspect_ratio,
             c=crop,
+            f=frame
         )
     i = 0
     while i < len(opt):
@@ -35,8 +42,9 @@ def _get_options(opt):
 WHITE_RGBA = (255, 255, 255, 0)
 BLACK_RGBA = (0, 0, 0, 0)
 
+
 def adjust(img, w=0, h=0, adjust_width=False, adjust_height=False, crop=False,
-           bgc=None):
+     frame=False, bgc=None):
     if adjust_width:
         w = w or int(h * img.size[0] / img.size[1])
     if adjust_height:
@@ -45,6 +53,23 @@ def adjust(img, w=0, h=0, adjust_width=False, adjust_height=False, crop=False,
         w = img.size[0]
     if h == 0:
         h = img.size[1]
+    if frame:
+        bg = PIL.Image.new('RGBA', (w, h), bgc or WHITE_RGBA)
+        img_w = img.size[0]
+        img_h = img.size[1]
+        offset_x = 0
+        offset_y = 0
+        if img_w / img_h > w / h:
+            temp_h = img_h * w / img_w
+            offset_y = (h - temp_h) / 2
+            h = temp_h
+        else:
+            temp_w = img_w * h / img_h
+            offset_x = (w - temp_w) / 2
+            w = temp_w
+        framed = img.resize((w, h), PIL.Image.ANTIALIAS)
+        bg.paste(framed, (offset_x, offset_y))
+        return bg
     if crop:
         offset_x = max((w - img.size[0]) / 2, 0)
         offset_y = max((h - img.size[1]) / 2, 0)
@@ -59,6 +84,7 @@ def adjust(img, w=0, h=0, adjust_width=False, adjust_height=False, crop=False,
         bg.paste(cropped, (offset_x, offset_y))
         return bg
     return img.resize((w, h), PIL.Image.ANTIALIAS)
+
 
 def parse(mode):
     parts = mode.split('-')
