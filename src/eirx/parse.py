@@ -14,11 +14,9 @@ def _get_size(size):
     raise ValueError('Invalid size')
 
 
-def _get_RGBA(opt_string, index):
-    if len(opt_string) > index + 6:
-        color_string = opt_string[index + 1: index + 7]
-        r, g, b = color_string[:2], color_string[2:4], color_string[4:]
-        return tuple((int(n, 16) for n in (r, g, b)))
+def _get_RGBA(opt, index):
+    if len(opt) > index + 6:
+        return tuple(int(opt[i * 2 + 3: i * 2 + 5], 16) for i in xrange(3))
     raise ValueError('Invalid color format, not xRRGGBB')
 
 
@@ -76,20 +74,22 @@ def adjust(img, w=0, h=0, adjust_width=False, adjust_height=False, crop=False,
     if h == 0:
         h = img.size[1]
     if frame:
-        bg = PIL.Image.new('RGBA', (w, h), bgc or WHITE_RGBA)
         img_w = img.size[0]
         img_h = img.size[1]
         offset_x = 0
         offset_y = 0
-        if img_w / img_h > w / h:
-            temp_h = img_h * w / img_w
-            offset_y = (h - temp_h) / 2
-            h = temp_h
+        resize_w = w
+        resize_h = h
+        if img_w * h > img_h * w:
+            resize_h = int(img_h * w / img_w)
+            offset_y = (h - resize_h) / 2
         else:
-            temp_w = img_w * h / img_h
-            offset_x = (w - temp_w) / 2
-            w = temp_w
-        framed = img.resize((w, h), PIL.Image.ANTIALIAS)
+            resize_w = int(img_w * h / img_h)
+            offset_x = (w - resize_w) / 2
+        framed = img.resize((resize_w, resize_h), PIL.Image.ANTIALIAS)
+        if offset_x == 0 and offset_y == 0:
+            return framed
+        bg = PIL.Image.new('RGBA', (w, h), bgc or WHITE_RGBA)
         bg.paste(framed, (offset_x, offset_y))
         return bg
     if crop:
