@@ -27,6 +27,8 @@ where *MODE* is in a form like *size-options* or *size* only.
 
 * a : absolute size; will clear the adjust height or width options
 * c : central crop; if the output size is less than the image size, only central part of the image is used (not resize or scratch the image)
+* f : framed mode; scratch the image to output size, with aspect ratio kept; then paste the scratched to the center of the output, and fill the rest part with a certain color
+* F : set filling color to white (with `Fw`), black (`Fb`) or customized (`FxRRGGBB`)
 
 *SRC* and *DEST* are files.
 
@@ -34,8 +36,10 @@ For example
 
     $ eirx w200h400 hello.png output.png
     $ eirx w200 hello.png output.png
+    $ eirx w1280h720-Fwc hello.png output.png
     $ eirxv w200h400-c hello.png
     $ eirxv w200-a hello.png
+    $ eirxv 400-fFx1010cc hello.png
 
 Quick Start API
 ===

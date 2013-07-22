@@ -17,12 +17,9 @@ def _get_size(size):
 def _get_RGBA(opt_string, index):
     if len(opt_string) > index + 6:
         color_string = opt_string[index + 1: index + 7]
-        match = re.compile('^[a-fA-F0-9]{6}$').match(color_string)
-        if match:
-            r, g, b = color_string[:2], color_string[2:4], color_string[4:]
-            r, g, b = [int(n, 16) for n in (r, g, b)]
-            return (r, g, b)
-    raise ValueError('Invalid RGB,not #RRGGBB format')
+        r, g, b = color_string[:2], color_string[2:4], color_string[4:]
+        return tuple((int(n, 16) for n in (r, g, b)))
+    raise ValueError('Invalid color format, not xRRGGBB')
 
 
 def _get_options(opt):
@@ -46,18 +43,18 @@ def _get_options(opt):
         elif opt_string[index] == 'b':
             opt_result['bgc'] = BLACK_RGBA
             return 1
-        elif opt_string[index] == '#':
+        elif opt_string[index] == 'x':
             opt_result['bgc'] = _get_RGBA(opt_string, index)
             return 7
-        raise ValueError('Invalid color')
+        raise ValueError('Invalid color format')
 
     opt_result = dict()
     opt_map = dict(
-            a=not_keep_aspect_ratio,
-            c=crop,
-            f=frame,
-            F=fcolor
-        )
+        a=not_keep_aspect_ratio,
+        c=crop,
+        f=frame,
+        F=fcolor,
+    )
     i = 0
     while i < len(opt):
         try:
@@ -69,7 +66,7 @@ def _get_options(opt):
 
 
 def adjust(img, w=0, h=0, adjust_width=False, adjust_height=False, crop=False,
-     frame=False, bgc=None):
+           frame=False, bgc=None):
     if adjust_width:
         w = w or int(h * img.size[0] / img.size[1])
     if adjust_height:
@@ -120,12 +117,12 @@ def parse(mode):
     return args
 
 _SIZE_RE = (
-        (re.compile('^w(?P<w>[0-9]+)h(?P<h>[0-9]+)$'),
-            lambda d: dict(w=int(d['w']), h=int(d['h']))),
-        (re.compile('^w(?P<w>[0-9]+)$'),
-            lambda d: dict(w=int(d['w']), adjust_height=True)),
-        (re.compile('^h(?P<h>[0-9]+)$'),
-            lambda d: dict(h=int(d['h']), adjust_width=True)),
-        (re.compile('^(?P<s>[0-9]+)$'),
-            lambda d: dict(w=int(d['s']), h=int(d['s']), crop=True)),
-    )
+    (re.compile('^w(?P<w>[0-9]+)h(?P<h>[0-9]+)$'),
+        lambda d: dict(w=int(d['w']), h=int(d['h']))),
+    (re.compile('^w(?P<w>[0-9]+)$'),
+        lambda d: dict(w=int(d['w']), adjust_height=True)),
+    (re.compile('^h(?P<h>[0-9]+)$'),
+        lambda d: dict(h=int(d['h']), adjust_width=True)),
+    (re.compile('^(?P<s>[0-9]+)$'),
+        lambda d: dict(w=int(d['s']), h=int(d['s']), crop=True)),
+)

@@ -2,6 +2,7 @@ import sys
 import PIL.Image
 from parse import parse, adjust
 
+
 def convert():
     if len(sys.argv) != 4:
         print >> sys.stderr, 'Usage:'
@@ -17,6 +18,7 @@ def convert():
     fmt = im.format
     adjust(im, **args).save(dest, format=fmt)
 
+
 def view():
     if len(sys.argv) != 3:
         print >> sys.stderr, 'Usage:'
@@ -28,3 +30,6 @@ def view():
 
     args = parse(mode)
     adjust(PIL.Image.open(src), **args).show()
+
+if __name__ == '__main__':
+    view()
