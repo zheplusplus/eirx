@@ -8,7 +8,7 @@ def descr():
 
 setup(
     name='eirx',
-    version='0.2',
+    version='0.21',
     author='Neuron Teckid',
     author_email='lene13@gmail.com',
     license='MIT',
@@ -18,9 +18,7 @@ setup(
     packages=find_packages('src'),
     package_dir={'': 'src'},
     long_description=descr(),
-    install_requires=[
-        'PIL',
-    ],
+    install_requires=[],
     zip_safe=False,
     entry_points=dict(
         console_scripts=[
