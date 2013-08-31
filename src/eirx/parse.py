@@ -1,6 +1,4 @@
 import re
-import PIL.Image
-
 
 WHITE_RGBA = (255, 255, 255)
 BLACK_RGBA = (0, 0, 0)
@@ -22,8 +20,8 @@ def _get_RGBA(opt, index):
 
 def _get_options(opt):
     def not_keep_aspect_ratio(opt_result, opt_string, index):
-        opt_result['adjust_height'] = False
-        opt_result['adjust_width'] = False
+        opt_result['adjh'] = False
+        opt_result['adjw'] = False
         return 0
 
     def crop(opt_result, opt_string, index):
@@ -32,6 +30,10 @@ def _get_options(opt):
 
     def frame(opt_result, opt_string, index):
         opt_result['frame'] = True
+        return 0
+
+    def window(opt_result, opt_string, index):
+        opt_result['window'] = True
         return 0
 
     def fcolor(opt_result, opt_string, index):
@@ -51,6 +53,7 @@ def _get_options(opt):
         a=not_keep_aspect_ratio,
         c=crop,
         f=frame,
+        w=window,
         F=fcolor,
     )
     i = 0
@@ -120,9 +123,9 @@ _SIZE_RE = (
     (re.compile('^w(?P<w>[0-9]+)h(?P<h>[0-9]+)$'),
         lambda d: dict(w=int(d['w']), h=int(d['h']))),
     (re.compile('^w(?P<w>[0-9]+)$'),
-        lambda d: dict(w=int(d['w']), adjust_height=True)),
+        lambda d: dict(w=int(d['w']), adjh=True)),
     (re.compile('^h(?P<h>[0-9]+)$'),
-        lambda d: dict(h=int(d['h']), adjust_width=True)),
+        lambda d: dict(h=int(d['h']), adjw=True)),
     (re.compile('^(?P<s>[0-9]+)$'),
         lambda d: dict(w=int(d['s']), h=int(d['s']), crop=True)),
 )

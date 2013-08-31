@@ -1,6 +1,6 @@
 import sys
 import PIL.Image
-from parse import parse, adjust
+from api import trans_image
 
 
 def convert():
@@ -13,10 +13,9 @@ def convert():
     src = sys.argv[2]
     dest = sys.argv[3]
 
-    args = parse(mode)
     im = PIL.Image.open(src)
     fmt = im.format
-    adjust(im, **args).save(dest, format=fmt)
+    trans_image(im, mode).save(dest, format=fmt)
 
 
 def view():
@@ -28,8 +27,7 @@ def view():
     mode = sys.argv[1]
     src = sys.argv[2]
 
-    args = parse(mode)
-    adjust(PIL.Image.open(src), **args).show()
+    trans_image(PIL.Image.open(src), mode).show()
 
 if __name__ == '__main__':
     view()
