@@ -26,7 +26,8 @@ where *MODE* is in a form like *size-options* or *size* only.
 *options* is a string, each character represent an option, the rule is
 
 * a : absolute size; will clear the adjust height or width options
-* c : central crop; if the output size is less than the image size, only central part of the image is used (not resize or scratch the image)
+* c : centralize & crop; resize the image to fill the size, and crop the part out of the region
+* w : window mode; if the output size is less than the image size, only central part of the image is used (not resize or scratch the image)
 * f : framed mode; scratch the image to output size, with aspect ratio kept; then paste the scratched to the center of the output, and fill the rest part with a certain color
 * F : set filling color to white (with `Fw`), black (`Fb`) or customized (`FxRRGGBB`)
 
