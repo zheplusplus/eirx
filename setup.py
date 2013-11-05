@@ -7,7 +7,7 @@ def descr():
 
 setup(
     name='eirx',
-    version='0.24',
+    version='0.30',
     author='Neuron Teckid',
     author_email='lene13@gmail.com',
     license='MIT',

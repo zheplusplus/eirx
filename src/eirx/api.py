@@ -1,6 +1,20 @@
 import PIL.Image
+import PIL.ImageFilter
 import parse
 import operator
+
+
+def decolor(im):
+    r, g, b = im.split()
+    im = PIL.Image.merge('RGB', (g,g,g))
+    return im
+
+_filters_map = {
+    'blur': lambda im: im.filter(PIL.ImageFilter.BLUR),
+    'cntr': lambda im: im.filter(PIL.ImageFilter.CONTOUR),
+    'edge': lambda im: im.filter(PIL.ImageFilter.FIND_EDGES),
+    'dclr': decolor,
+}
 
 
 def _resize_fill(img, w, h, bgc, ratio_f):
@@ -33,6 +47,9 @@ def adjust(img, w=0, h=0, adjw=False, adjh=False, bgc=None, **kwargs):
         w = img.size[0]
     if h == 0:
         h = img.size[1]
+    if kwargs.get('filters'):
+        for f in kwargs['filters']:
+            img = _filters_map[f](img)
     if kwargs.get('frame'):
         return _resize_fill(img, w, h, bgc, operator.gt)
     if kwargs.get('crop'):

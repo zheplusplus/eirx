@@ -48,13 +48,18 @@ def _get_options(opt):
             return 7
         raise ValueError('Invalid color format')
 
-    opt_result = dict()
+    def addfilter(opt_result, opt_string, index):
+        opt_result['filters'].append(opt_string[index: index + 4])
+        return 4
+
+    opt_result = dict(filters=[])
     opt_map = dict(
         a=not_keep_aspect_ratio,
         c=crop,
         f=frame,
         w=window,
         F=fcolor,
+        x=addfilter,
     )
     i = 0
     while i < len(opt):

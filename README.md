@@ -49,9 +49,9 @@ Quick Start API
     >>> from eirx.api import adjust, trans_file
     >>> from PIL import Image
     >>>
-    >>> args = parse('w200h300')
-    >>> im = adjust(Image.open('hello.png'), **args)
-    >>> im.show()
-    >>>
     >>> im = trans_file('hello.png', 'w200h300')
     >>> im.save('output.png')
+    >>>
+    >>> args = parse('w200h300-xedge')
+    >>> im = adjust(Image.open('hello.png'), **args)
+    >>> im.show()
