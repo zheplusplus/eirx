@@ -5,8 +5,8 @@ import operator
 
 
 def decolor(im):
-    r, g, b = im.split()
-    im = PIL.Image.merge('RGB', (g,g,g))
+    g = im.split()[1]
+    im = PIL.Image.merge('RGB', (g, g, g))
     return im
 
 _filters_map = {

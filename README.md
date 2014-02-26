@@ -22,6 +22,7 @@ where *MODE* is in a form like *size-options* or *size* only.
 * wWIDTH : to certain width (and the adjust height option will automatically set in this mode)
 * hHEIGHT : to certain height (and the adjust width option will automatically set in this mode)
 * LENGTH : to square, with side length set (and the central crop option will automatically set in this mode)
+* o: keep original size
 
 *options* is a string, each character represent an option, the rule is
 
@@ -30,6 +31,7 @@ where *MODE* is in a form like *size-options* or *size* only.
 * w : window mode; if the output size is less than the image size, only central part of the image is used (not resize or scratch the image)
 * f : framed mode; scratch the image to output size, with aspect ratio kept; then paste the scratched to the center of the output, and fill the rest part with a certain color
 * F : set filling color to white (with `Fw`), black (`Fb`) or customized (`FxRRGGBB`)
+* x : apply a filter; read wiki for detail please
 
 *SRC* and *DEST* are files.
 
@@ -41,6 +43,7 @@ For example
     $ eirxv w200h400-c hello.png
     $ eirxv w200-a hello.png
     $ eirxv 400-fFx1010cc hello.png
+    $ eirxv o-xdclr hello.png
 
 Quick Start API
 ===
