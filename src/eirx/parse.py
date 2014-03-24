@@ -20,12 +20,15 @@ def _get_RGBA(opt, index):
 
 def _get_options(opt):
     def not_keep_aspect_ratio(opt_result, opt_string, index):
-        opt_result['adjh'] = False
-        opt_result['adjw'] = False
+        opt_result['size_adj'] = False
         return 0
 
     def crop(opt_result, opt_string, index):
         opt_result['crop'] = True
+        return 0
+
+    def top_crop(opt_result, opt_string, index):
+        opt_result['top_crop'] = True
         return 0
 
     def frame(opt_result, opt_string, index):
@@ -56,6 +59,7 @@ def _get_options(opt):
     opt_map = dict(
         a=not_keep_aspect_ratio,
         c=crop,
+        t=top_crop,
         f=frame,
         w=window,
         F=fill_color,
@@ -79,13 +83,25 @@ def parse(mode):
             args[opt] = value
     return args
 
+
+def _one_dim(dim, size):
+    if dim in ['h', 'w', 'wma', 'hma']:
+        return {dim: int(size), 'size_adj': True}
+    raise ValueError('Invalid dimension: ' + dim)
+
+
+def _two_dim(dim_a, size_a, dim_b, size_b):
+    if dim_a[0] == dim_b[0]:
+        raise ValueError('Dimension duplicated')
+    if dim_a in ['h', 'w', 'wma', 'hma'] and dim_b in ['h', 'w', 'wma', 'hma']:
+        return {dim_a: int(size_a), dim_b: int(size_b)}
+    raise ValueError('Invalid dimension: {}/{}'.format(dim_a, dim_b))
+
 _SIZE_RE = (
-    (re.compile('^w(?P<w>[0-9]+)h(?P<h>[0-9]+)$'),
-        lambda d: dict(w=int(d['w']), h=int(d['h']))),
-    (re.compile('^w(?P<w>[0-9]+)$'),
-        lambda d: dict(w=int(d['w']), adjh=True)),
-    (re.compile('^h(?P<h>[0-9]+)$'),
-        lambda d: dict(h=int(d['h']), adjw=True)),
+    (re.compile('^(?P<dim_a>[a-z]+)(?P<size_a>[0-9]+)(?P<dim_b>[a-z]+)' +
+                '(?P<size_b>[0-9]+)$'), lambda d: _two_dim(**d)),
+    (re.compile('^(?P<dim>[a-z]+)(?P<size>[0-9]+)$'),
+        lambda d: _one_dim(**d)),
     (re.compile('^(?P<s>[0-9]+)$'),
         lambda d: dict(w=int(d['s']), h=int(d['s']), crop=True)),
     (re.compile('^o$'), lambda _: dict()),

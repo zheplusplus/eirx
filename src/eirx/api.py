@@ -17,7 +17,7 @@ _filters_map = {
 }
 
 
-def _resize_fill(img, w, h, bgc, ratio_f):
+def _resize_fill(img, w, h, bgc, ratio_f, force_off_y=None):
     img_w = img.size[0]
     img_h = img.size[1]
     offset_x = 0
@@ -26,22 +26,23 @@ def _resize_fill(img, w, h, bgc, ratio_f):
     resize_h = h
     if ratio_f(img_w * h, img_h * w):
         resize_h = int(img_h * w / img_w)
-        offset_y = (h - resize_h) / 2
+        offset_y = (h - resize_h) / 2 if force_off_y is None else force_off_y
     else:
         resize_w = int(img_w * h / img_h)
         offset_x = (w - resize_w) / 2
     framed = img.resize((resize_w, resize_h), PIL.Image.ANTIALIAS)
-    if offset_x == 0 and offset_y == 0:
-        return framed
     bg = PIL.Image.new('RGBA', (w, h), bgc or parse.WHITE_RGBA)
     bg.paste(framed, (offset_x, offset_y))
     return bg
 
 
-def adjust(img, w=0, h=0, adjw=False, adjh=False, bgc=None, **kwargs):
-    if adjw:
+def adjust(img, w=0, h=0, wma=0, hma=0, size_adj=False, bgc=None, **kwargs):
+    if wma != 0:
+        w = min(img.size[0], wma)
+    if hma != 0:
+        h = min(img.size[1], hma)
+    if size_adj:
         w = w or int(h * img.size[0] / img.size[1])
-    if adjh:
         h = h or int(w * img.size[1] / img.size[0])
     if w == 0:
         w = img.size[0]
@@ -52,6 +53,8 @@ def adjust(img, w=0, h=0, adjw=False, adjh=False, bgc=None, **kwargs):
             img = _filters_map[f](img)
     if kwargs.get('frame'):
         return _resize_fill(img, w, h, bgc, operator.gt)
+    if kwargs.get('top_crop'):
+        return _resize_fill(img, w, h, bgc, operator.lt, force_off_y=0)
     if kwargs.get('crop'):
         return _resize_fill(img, w, h, bgc, operator.lt)
     if kwargs.get('window'):
