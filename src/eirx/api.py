@@ -1,6 +1,6 @@
 import PIL.Image
 import PIL.ImageFilter
-import parse
+from eirx import parse
 import operator
 
 
